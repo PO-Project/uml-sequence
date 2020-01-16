@@ -1,0 +1,6 @@
+[submodule "common"]
+	path = common
+	url = https://github.com/PO-Project/common-interface
+[submodule "backends/vim-backend"]
+	path = backends/vim-backend
+	url = https://github.com/PO-Project/vim-backend
