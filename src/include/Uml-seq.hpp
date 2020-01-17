@@ -41,15 +41,35 @@ public:
 
         setEntry("IS_SAVED", "YES");
 
-        bk.bind(":newact ${ARG}", [this](void){
+        bk.bind(":act ${ARG}", [this](void){
             logix.addProcess(getEntry("ARG"));
         }, "Creates a new actor with specified name");
 
-        bk.bind(":rmact ${ARG}", [this](void){
+        bk.bind(":rma ${ARG}", [this](void){
             logix.remProcess(getEntry("ARG"));
         }, "Removes all actors with specified name");
 
-        bk.bind("crs", nullptr, "Throw unhandled exception");
+        bk.bind(":sel ${ARG}", [this](void){
+            logix.selectByName(getEntry("ARG"));
+        }, "Selects first actor with specified name");
+
+        bk.bind(":unsel", [this](void){
+            logix.deselect(true);
+        }, "Unselect actors");
+
+        bk.bind(":edit ${ARG}", [this](void){
+            logix.editSelected(getEntry("ARG"));
+        }, "Edits selected actor.");
+
+        bk.bind("<DEL>", [this](void){
+            logix.deleteSelected();
+        }, "Deletes selected actor.");
+
+        bk.bind(":del", [this](void){
+            logix.deleteSelected();
+        }, "Deletes selected actor.");
+
+        bk.bind(":crs", nullptr, "Throw unhandled exception");
        
     }
 

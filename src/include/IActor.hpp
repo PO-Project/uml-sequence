@@ -5,7 +5,7 @@
 
 struct IActor : public IDrawable
 {
-    //structurally identical to IDrawable
+    bool selected{false};
 };
 
 #endif

@@ -42,6 +42,14 @@ class Process : public IActor
             box.p = p;
         }
 
+        Point getCenter() const
+        {
+            auto blc = box.leftUpperCorner();
+            auto brc = box.rightLowerCorner();
+
+            return {blc.x  + ((brc.x - blc.x) / 2), (blc.y - brc.y)/2 + blc.y};
+        }
+
         virtual void draw(IRenderer &r)override
         {
             if(selected)r.setAttribute(A_REVERSE);
@@ -61,7 +69,6 @@ class Process : public IActor
             if(selected)r.unsetAttribute(A_REVERSE);
         }
 
-    bool selected{false};
 };
 
 #endif

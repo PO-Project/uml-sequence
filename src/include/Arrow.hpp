@@ -5,6 +5,8 @@
 
 class Arrow : public Line
 {
+    public:
+    
     Arrow(Point a, Point b) : Line(a - 1, b - 1) {}
 
     void draw(IRenderer *r)
@@ -21,7 +23,7 @@ class Arrow : public Line
         }
         else
         {
-            //nie trzeba xD
+            std::terminate();
         }
             
     }
