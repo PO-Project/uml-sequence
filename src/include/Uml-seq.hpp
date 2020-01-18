@@ -61,6 +61,10 @@ public:
             logix.editSelected(getEntry("ARG"));
         }, "Edits selected actor.");
 
+        bk.bind(":mode ${ARG}", [this](void){
+            logix.setEditionMode(getEntry("ARG"));
+        }, "Set edition mode (actors/signals).");
+
         bk.bind("<DEL>", [this](void){
             logix.deleteSelected();
         }, "Deletes selected actor.");
@@ -68,6 +72,14 @@ public:
         bk.bind(":del", [this](void){
             logix.deleteSelected();
         }, "Deletes selected actor.");
+
+        bk.bind(":r", [this](void){
+            logix.right();
+        }, "Select right/next actor");
+
+        bk.bind(":l", [this](void){
+            logix.left();
+        }, "Select left/previous actor");
 
         bk.bind(":crs", nullptr, "Throw unhandled exception");
        
