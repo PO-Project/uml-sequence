@@ -15,6 +15,9 @@ class Process : public IActor
 
     static constexpr unsigned maxNameSize {8};
 
+    std::vector<std::weak_ptr<Signal>> signalsIn;
+    std::vector<std::weak_ptr<Signal>> signalsOut;
+
     void boxUpdateName()
     {
         if(name.size() > maxNameSize)box.content = name.substr(0, maxNameSize - 3) + "...";
@@ -22,6 +25,9 @@ class Process : public IActor
     }
 
     public:
+
+        int signalEndPositionVertical{0};
+
         Process() = default;
 
         Process(std::string name, Point pos = {0,0}) : name(name)
@@ -40,9 +46,25 @@ class Process : public IActor
         void setPosition(Point p)
         {
             box.p = p;
+
+            for(auto &i : signalsIn)
+            {
+                if(auto strong = i.lock())
+                {
+                    strong->b.x = p.x;
+                }
+            }
+
+            for(auto &i : signalsOut)
+            {
+                if(auto strong = i.lock())
+                {
+                    strong->e.x = p.x;
+                }
+            }
         }
 
-        Point getCenter() const
+        Point getCenter() const override
         {
             auto blc = box.leftUpperCorner();
             auto brc = box.rightLowerCorner();
@@ -50,7 +72,42 @@ class Process : public IActor
             return {blc.x  + ((brc.x - blc.x) / 2), (blc.y - brc.y)/2 + blc.y};
         }
 
-        virtual void draw(IRenderer &r)override
+        void pipeSignalFrom(std::weak_ptr<Signal> sig)
+        {
+            signalsOut.push_back(sig);
+
+            //enforce x position
+            (signalsOut.back().lock())->b.x = getCenter().x;
+        }
+        void pipeSignalTo(std::weak_ptr<Signal> sig)
+        {
+            signalsIn.push_back(sig);
+
+            //enforce x position
+            (signalsIn.back().lock())->e.x = getCenter().x;
+        }
+
+        void cullDeadSignals(int mode) //bit mask bit1 - out, bit0 - in
+        {
+            if(mode & 1)
+            {
+                signalsIn.erase(std::remove_if(signalsIn.begin(), signalsIn.end(), 
+                    [](const std::weak_ptr<Signal> &p) -> bool
+                    {
+                        return (!p.lock());
+                }), signalsIn.end());
+            }
+            else if (mode & 2)
+            {
+                signalsOut.erase(std::remove_if(signalsOut.begin(), signalsOut.end(), 
+                    [](const std::weak_ptr<Signal> &p) -> bool
+                    {
+                        return (!p.lock());
+                }), signalsOut.end());
+            }
+        }
+
+        virtual void draw(IRenderer &r) override
         {
             if(selected)r.setAttribute(A_REVERSE);
 
@@ -62,7 +119,7 @@ class Process : public IActor
             auto lineX = blc.x  + ((brc.x - blc.x) / 2);
 
             line.start = {lineX, brc.y + 1};
-            line.end =   {lineX, brc.y + 3};
+            line.end =   {lineX, std::max(brc.y + 1, signalEndPositionVertical+1)};
             
             line.draw(r);
 

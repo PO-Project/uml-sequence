@@ -8,9 +8,15 @@
 class Signal : public IActor
 {
     protected:
+    
     std::unique_ptr<IDrawable> entity;
+    Point b,e;
 
     public:
+
+    Signal() = default;
+
+    virtual void lateConstructor() = 0;
 
     virtual void draw(IRenderer &r) override
     {
@@ -18,26 +24,45 @@ class Signal : public IActor
             entity->draw(r);
         if(selected)r.unsetAttribute(A_REVERSE);
     }
+
+    Point getCenter() const override
+    {
+        return {(b.x + e.x) / 2, (b.y + e.y) / 2};
+    }
+
+    friend class Process;
+    friend class Logic;
 };
 
 class InformationSignal : public Signal
 {
     public:
 
-    InformationSignal(Point s, Point p)
+    InformationSignal() = default;
+
+    void lateConstructor()
     {
-        entity = std::make_unique<Line>(s, p);
+        entity = std::make_unique<Line>(b, e);
     }
+
+    friend class Process;
+    friend class Logic;
 };
 
 class ProcessSwitchSignal : public Signal
 {
     public:
 
-    ProcessSwitchSignal(Point s, Point p)
+    ProcessSwitchSignal() = default;
+
+    void lateConstructor()
     {
-        entity = std::make_unique<Arrow>(s, p);
+        entity = std::make_unique<Line>(b, e);
     }
+
+    friend class Process;
+    friend class Logic;
 };
+
 
 #endif

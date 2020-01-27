@@ -17,6 +17,12 @@ class Logic
     static constexpr int minSpace = 12;
     static constexpr int minYPosition = 2;
     int actPosition{0};
+    ///////
+    static constexpr int minSignalPosition{5};
+    static constexpr int minSignalSeparation = 3;
+    int actSignalPosition{minSignalPosition};
+    ///////
+
     
     IRenderer *rend{nullptr};
 
@@ -29,12 +35,21 @@ class Logic
 
     editionMode currentMode{editionMode::None};
 
-    void refitAll()
+    void refitAll() //legacy, means Processes
     {
         actPosition = 0;
         for(auto& i : processes)
         {
             i->setPosition({actPosition += minSpace, minYPosition});
+        }
+    }
+    void refitAllSigs()
+    {
+        actSignalPosition = minSignalPosition;
+        for(auto& i : signals)
+        {
+            i->b.y = actSignalPosition += minSignalSeparation;
+            i->e.y = actSignalPosition;
         }
     }
 
@@ -61,6 +76,16 @@ class Logic
         }));
     }
 
+    template <typename T>
+    auto findByName(std::string name, const std::vector<std::shared_ptr<T>> &ct) const
+    {
+        return (std::find_if(ct.begin(), ct.end(), 
+        [&name](const std::shared_ptr<T> &p)
+            {
+                return p->getName() == name;
+        }));
+    }
+
     public:
 
     Logic() = default;
@@ -70,6 +95,12 @@ class Logic
         rend = r;
     }
 
+    void center(bool hard = false)
+    {
+        if(auto strong = procSelected.lock())rend->setCenter(strong->getCenter());
+        if(hard)render();
+    }
+
     void setEditionMode(std::string mode)
     {
         std::for_each(mode.begin(), mode.begin(), [](char &c)
@@ -77,11 +108,11 @@ class Logic
             c = tolower(c);
         });
 
-        if(mode == "actors" || mode == "actor" || mode == "process" || mode == "processes" || mode == "procs" || mode == "proc")
+        if(mode == "actors" || mode == "actor" || mode == "act" || mode == "process" || mode == "processes" || mode == "procs" || mode == "proc" || mode == "a" || mode == "p")
         {
             currentMode = editionMode::Procs;
         }
-        else if(mode == "signals" || mode == "signal" || mode == "sign")
+        else if(mode == "signals" || mode == "signal" || mode == "sign" || mode == "sig" || mode == "s")
         {
             currentMode = editionMode::Signals;
         }
@@ -90,9 +121,7 @@ class Logic
             currentMode = editionMode::None;
         }
 
-        procSelected.reset();
-        deselect(true);
-        
+        deselect(true);        
     }
 
     void addProcess(std::string name)
@@ -112,7 +141,7 @@ class Logic
         {
             auto oldsize = processes.size();
 
-            auto it = processes.erase(std::remove_if(processes.begin(), processes.end(), 
+            processes.erase(std::remove_if(processes.begin(), processes.end(), 
                 [&name](const std::shared_ptr<Process> &p)
                 {
                     return p->getName() == name;
@@ -130,11 +159,7 @@ class Logic
     {
         if(currentMode == editionMode::Procs)
         {
-            auto it = (std::find_if(processes.begin(), processes.end(), 
-                [&name](const std::shared_ptr<Process> &p)
-                {
-                    return p->getName() == name;
-            }));
+            auto it = findByName(name, processes);
 
             if(it != processes.end())
             {
@@ -184,7 +209,7 @@ class Logic
             {
                 auto oldsize = container.size();
 
-                auto it = container.erase(std::remove_if(container.begin(), container.end(), 
+                container.erase(std::remove_if(container.begin(), container.end(), 
                     [&strong](const std::shared_ptr<IActor> &p)
                     {
                         return p.get() == strong.get();
@@ -204,7 +229,7 @@ class Logic
             {
                 auto oldsize = container.size();
 
-                auto it = container.erase(std::remove_if(container.begin(), container.end(), 
+                container.erase(std::remove_if(container.begin(), container.end(), 
                     [&strong](const std::shared_ptr<IActor> &p)
                     {
                         return p.get() == strong.get();
@@ -212,7 +237,7 @@ class Logic
 
                 if(oldsize != container.size())
                 {
-                    refitAll();
+                    refitAllSigs();
                     render();
                 }
             }
@@ -302,6 +327,11 @@ class Logic
             }
         }
 
+        if(strong)
+        {
+            center();
+        }
+
         render();
     }
 
@@ -387,6 +417,42 @@ class Logic
             }
         }
 
+        if(strong)
+        {
+            center();
+        }
+
+        render();
+    }
+
+    void appendCreateInfSignalFromTo(std::string from, std::string to)
+    {
+        if(currentMode != editionMode::Signals)
+        {
+            return;
+        }
+
+        auto it1 = findByName(from, processes);
+        auto it2 = findByName(to, processes);
+
+        if(it1 == processes.end() || it2 == processes.end())
+        {
+            return;
+        }
+
+        auto newsignal = std::make_shared<InformationSignal>();
+
+        newsignal->b = {0 /*to be set by process*/, actSignalPosition += minSignalSeparation};
+        newsignal->e = {0 /*a.b.*/, actSignalPosition};
+
+        (*it1)->signalEndPositionVertical = actSignalPosition;
+        (*it2)->signalEndPositionVertical = actSignalPosition;
+
+        (*it1)->pipeSignalFrom(newsignal);
+        (*it2)->pipeSignalTo(newsignal);
+
+        signals.push_back(std::move(newsignal));
+
         render();
     }
 
@@ -398,6 +464,12 @@ class Logic
 
         for(auto &i : processes)
         {
+            i->draw(*rend);
+        }
+
+        for(auto &i : signals)
+        {            
+            i->lateConstructor();
             i->draw(*rend);
         }
 

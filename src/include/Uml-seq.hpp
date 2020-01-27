@@ -80,6 +80,14 @@ public:
         bk.bind(":l", [this](void){
             logix.left();
         }, "Select left/previous actor");
+        
+        bk.bind(":c", [this](void){
+            logix.center(true);
+        }, "Center on selected actor");
+
+        bk.bind(":afs ${ARG} ${AARG}", [this](void){
+            logix.appendCreateInfSignalFromTo(getEntry("ARG"), getEntry("AARG"));
+        }, "Add information signal between two processes.");
 
         bk.bind(":crs", nullptr, "Throw unhandled exception");
        

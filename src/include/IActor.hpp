@@ -6,6 +6,8 @@
 struct IActor : public IDrawable
 {
     bool selected{false};
+
+    virtual Point getCenter() const = 0;
 };
 
 #endif

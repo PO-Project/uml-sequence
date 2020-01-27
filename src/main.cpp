@@ -7,7 +7,7 @@
 #include "ExampleTool.hpp"
 #include "include/Logic.hpp"
 
-int main(int argc, char *argv[])
+int main()
 {
     tools::UmlSeq tool;
     backends::VimBackend backend;

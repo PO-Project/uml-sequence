@@ -19,16 +19,22 @@ class Line : public IDrawable
         {
             if(start.x == end.x)
             {
-                for(unsigned i = 0; i < abs(start.y - end.y); i++)
+                int off = 1;
+                if(start.y > end.y)off = -1;
+
+                for(unsigned i = 0; i < abs(end.y - start.y); i++)
                 {
-                    r.renderString("|", {start.x, start.y + i});
+                    r.renderString("|", {start.x, start.y + off*i});
                 }
             }
             else if(start.y == end.y)
             {
-                for(unsigned i = 0; i < abs(start.x - end.x); i++)
+                int off = 1;
+                if(start.x > end.x)off = -1;
+
+                for(unsigned i = 0; i < abs(end.x - start.x); i++)
                 {
-                    r.renderString("-", {start.x + i, start.y});
+                    r.renderString("-", {start.x + off*i, start.y});
                 }
             }
             else
