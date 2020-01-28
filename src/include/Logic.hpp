@@ -51,6 +51,10 @@ class Logic
             i->b.y = actSignalPosition += minSignalSeparation;
             i->e.y = actSignalPosition;
         }
+        for(auto& i : processes)
+        {
+            i->findVerticalEnd();
+        }
     }
 
     /*
@@ -84,6 +88,15 @@ class Logic
             {
                 return p->getName() == name;
         }));
+    }
+
+    void cullSignals()
+    {
+        signals.erase(std::remove_if(signals.begin(), signals.end(), 
+        [](const std::shared_ptr<Signal> &p)
+        {
+            return !p->start.lock() || !p->end.lock();
+        }), signals.end());
     }
 
     public:
@@ -149,7 +162,11 @@ class Logic
 
             if(oldsize != processes.size())
             {
+                cullSignals();
+
                 refitAll();
+                refitAllSigs();
+
                 render();
             }
         }
@@ -200,7 +217,7 @@ class Logic
         }
     }
 
-    void deleteSelected() //bad design
+    void deleteSelected()
     {
         if(currentMode == editionMode::Procs)
         {
@@ -217,7 +234,13 @@ class Logic
 
                 if(oldsize != container.size())
                 {
+                    strong.reset(); //elimin. silnego dowiązania
+
+                    cullSignals();
+
                     refitAll();
+                    refitAllSigs();
+
                     render();
                 }
             }
@@ -454,8 +477,11 @@ class Logic
         newsignal->b = {0 /*to be set by process*/, actSignalPosition += minSignalSeparation};
         newsignal->e = {0 /*a.b.*/, actSignalPosition};
 
-        (*it1)->signalEndPositionVertical = actSignalPosition;
-        (*it2)->signalEndPositionVertical = actSignalPosition;
+        newsignal->start = *it1;
+        newsignal->end = *it2;
+
+        //(*it1)->signalEndPositionVertical = actSignalPosition;
+        //(*it2)->signalEndPositionVertical = actSignalPosition;
 
         (*it1)->pipeSignalFrom(newsignal);
         (*it2)->pipeSignalTo(newsignal);
@@ -487,6 +513,9 @@ class Logic
 
         newsignal->b = {0 /*to be set by process*/, actSignalPosition += minSignalSeparation};
         newsignal->e = {0 /*a.b.*/, actSignalPosition};
+
+        newsignal->start = *it1;
+        newsignal->end = *it2;
 
         (*it1)->signalEndPositionVertical = actSignalPosition;
         (*it2)->signalEndPositionVertical = actSignalPosition;

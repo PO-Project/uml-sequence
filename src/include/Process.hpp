@@ -97,7 +97,7 @@ class Process : public IActor
                         return (!p.lock());
                 }), signalsIn.end());
             }
-            else if (mode & 2)
+            if (mode & 2)
             {
                 signalsOut.erase(std::remove_if(signalsOut.begin(), signalsOut.end(), 
                     [](const std::weak_ptr<Signal> &p) -> bool
@@ -105,6 +105,24 @@ class Process : public IActor
                         return (!p.lock());
                 }), signalsOut.end());
             }
+        }
+
+        void findVerticalEnd()
+        {
+            cullDeadSignals(3);
+
+            auto cmp = [](std::weak_ptr<Signal> a, std::weak_ptr<Signal> b)
+            {
+                return a.lock()->e.y < b.lock()->e.y;
+            };
+
+            auto s1 = std::max_element(signalsIn.begin(), signalsIn.end(), cmp);
+            auto s2 = std::max_element(signalsOut.begin(), signalsOut.end(), cmp);
+
+            auto a = s1 == signalsIn.end() ? 0 : s1->lock()->e.y;
+            auto b = s2 == signalsOut.end() ? 0 : s2->lock()->e.y;
+
+            signalEndPositionVertical = std::max(a, b);
         }
 
         virtual void draw(IRenderer &r) override

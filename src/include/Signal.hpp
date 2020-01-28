@@ -5,6 +5,8 @@
 #include "Arrow.hpp"
 #include <memory>
 
+class Process;
+
 class Signal : public IActor
 {
     protected:
@@ -13,6 +15,8 @@ class Signal : public IActor
     Point b,e;
 
     public:
+
+    std::weak_ptr<Process> start, end;
 
     Signal() = default;
 
