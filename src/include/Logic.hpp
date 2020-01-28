@@ -482,9 +482,6 @@ class Logic
         newsignal->start = *it1;
         newsignal->end = *it2;
 
-        //(*it1)->signalEndPositionVertical = actSignalPosition;
-        //(*it2)->signalEndPositionVertical = actSignalPosition;
-
         (*it1)->pipeSignalFrom(newsignal);
         (*it2)->pipeSignalTo(newsignal);
 

@@ -48,19 +48,6 @@ class Process : public IActor, public IXmlAble
             std::string ret;
 
             ret += XML::makeTag("name", name);
-            
-            /*for(auto &i : signalsIn)
-            {
-                ret += XML::openTag("signalsIn");
-                ret += XML::makeTag("target", reinterpret_cast<long unsigned int>(i.lock().get()));
-                ret += XML::closeTag("signalsIn");
-            }
-            for(auto &i : signalsOut)
-            {
-                ret += XML::openTag("signalsOut");
-                ret += XML::makeTag("target", reinterpret_cast<long unsigned int>(i.lock().get()));
-                ret += XML::closeTag("signalsOut");
-            }*/
 
             return ret;
         }
@@ -73,7 +60,7 @@ class Process : public IActor, public IXmlAble
             {
                 if(auto strong = i.lock())
                 {
-                    strong->b.x = p.x;
+                    strong->e.x = getCenter().x;
                 }
             }
 
@@ -81,7 +68,7 @@ class Process : public IActor, public IXmlAble
             {
                 if(auto strong = i.lock())
                 {
-                    strong->e.x = p.x;
+                    strong->b.x = getCenter().x;
                 }
             }
         }
