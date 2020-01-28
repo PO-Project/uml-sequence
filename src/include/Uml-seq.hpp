@@ -112,6 +112,10 @@ public:
         bk.bind(":save ${ARG}", [this](void){
             logix.save(getEntry("ARG"));
         }, "Export to xml format");
+
+        bk.bind(":load ${ARG}", [this](void){
+            logix.load(getEntry("ARG"));
+        }, "Load from xml file");
        
     }
 

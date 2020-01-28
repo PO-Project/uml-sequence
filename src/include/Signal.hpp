@@ -16,7 +16,10 @@ class Signal : public IActor, public IXmlAble
 
     public:
 
-    static constexpr int id{0};
+    inline virtual int identify() const
+    {
+        return 0;
+    }
 
     std::weak_ptr<Process> start, end;
 
@@ -37,6 +40,7 @@ class Signal : public IActor, public IXmlAble
 
         ret+=XML::makeTag("starts", reinterpret_cast<long unsigned int>(start.lock().get()));
         ret+=XML::makeTag("ends", reinterpret_cast<long unsigned int>(end.lock().get()));
+        ret+=XML::makeTag("type", identify());
 
         return ret;
     }
@@ -54,7 +58,10 @@ class InformationSignal : public Signal
 {
     public:
 
-    static constexpr int id{1};
+    inline virtual int identify() const override
+    {
+        return 1;
+    }
 
     InformationSignal() = default;
 
@@ -71,7 +78,10 @@ class ProcessSwitchSignal : public Signal
 {
     public:
 
-    static constexpr int id{2};
+    inline virtual int identify() const override
+    {
+        return 2;
+    }
 
     ProcessSwitchSignal() = default;
 

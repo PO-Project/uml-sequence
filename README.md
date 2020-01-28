@@ -1,11 +1,11 @@
 # Uml Sequence editor
-Status: tworzony `(39%)`
+Status: tworzony `(89%)`
 
 ## Wspierane backendy
 
 | Backend | Status          | Uwagi                                                         |
-|:-------:|:---------------:|---------------------------------------------------------------|
-| Vim     | W trakcie pracy | Nie działa bindowanie klawiszy, bo nikt nie ustalił standardu |
+|:-------:|:---------------:|:---------------------------------------------------------------:|
+| Vim     | W trakcie pracy | - |
 | MCedit  | -               |                                                               |
 |         |                 |                                                               |
 

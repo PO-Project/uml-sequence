@@ -23,7 +23,6 @@ class Logic
     static constexpr int minSignalSeparation = 3;
     int actSignalPosition{minSignalPosition};
     ///////
-
     
     IRenderer *rend{nullptr};
 
@@ -497,9 +496,9 @@ class Logic
     }
 
     template <typename T>
-    void appendCreateSignalGeneric(std::string from, std::string to)
+    void appendCreateSignalGeneric(std::string from, std::string to, bool override = false)
     {
-        if(currentMode != editionMode::Signals)
+        if(currentMode != editionMode::Signals && !override)
         {
             return;
         }
@@ -535,30 +534,177 @@ class Logic
     {
         std::ofstream file(fname);
 
+        if(!file)
+        {
+            return;
+        }
+
+        file<<XML::openTag("processes");
         for(auto &i : processes)
         {
             //i->cullDeadSignals(3);
-            file<<XML::openTag("processes");
             file<<XML::openTag("process");
             file<<XML::makeTag("id", reinterpret_cast<long unsigned int>(i.get()));
             file<<XML::partDelegate(*(i.get()), "processDetails");
             file<<XML::closeTag("process");
-            file<<XML::closeTag("processes");
-        }
 
+        }
+        file<<XML::closeTag("processes");
+        
         this->cullSignals();
 
+        file<<XML::openTag("signals");
         for(auto &i : signals)
         {
-            file<<XML::openTag("signals");
             file<<XML::openTag("signal");
             file<<XML::makeTag("id", reinterpret_cast<long unsigned int>(i.get()));
             file<<XML::partDelegate(*(i.get()), "signalDetails");
             file<<XML::closeTag("signal");
-            file<<XML::closeTag("signals");
+
+        }
+        file<<XML::closeTag("signals");
+
+        file.close();
+
+    }
+
+    void load(std::string fname)
+    {
+        std::ifstream file(fname);
+
+        if(!file)
+        {
+            return;
+        }
+
+        procSelected.reset();
+        processes.erase(processes.begin(), processes.end());
+        signals.erase(signals.begin(), signals.end());
+
+        std::string buff;
+
+        editionMode em{editionMode::None};
+        bool aip = false; //actorInProgress
+
+        std::map<std::string, int> translator;
+        int nump = 0;
+
+        std::string beg, end;
+        int type;
+        bool detailsMode = false;
+
+        while(file >> buff)
+        {
+            if(buff == "<processes>")
+            {
+                em = editionMode::Procs;
+                continue;
+            }
+            else if(buff == "<signals>")
+            {
+                em = editionMode::Signals;
+                continue;
+            }
+            else if(buff == "</processes>" || buff == "</signals>")
+            {
+                em = editionMode::None;
+                continue;
+            }
+
+            if(buff == "<process>" || buff == "<signal>")
+            {
+                aip = true;
+                continue;
+            }
+            else if(buff == "</process>" || buff == "</signal>")
+            {
+                aip = false;
+                continue;
+            }
+
+            if(!aip)continue; //strażnik ważniejszej części
+
+            switch(em)
+            {
+                case editionMode::Procs:
+                {
+                    if(buff == "<id>")
+                    {
+                        file >> buff;
+                        translator.insert({buff, nump++});
+                    }
+                    else if(buff == "<processDetails>")
+                    {
+                        file >> buff;
+                        if(buff == "<name>")
+                        {
+                            file >> buff;
+                            processes.push_back(std::move(std::make_shared<Process>(buff, Point(0,0))));
+
+                        }
+                    }
+                    break;
+                }
+                case editionMode::Signals:
+                {
+                    if(buff == "</signalDetails>")
+                    {
+                        detailsMode = false;
+                        
+                        std::shared_ptr<Signal> newsig;
+                        
+                        auto namebeg = processes[translator[beg]];
+                        auto nameend = processes[translator[end]];
+
+                        switch(type)
+                        {
+                            case 1:
+                            this->appendCreateSignalGeneric<InformationSignal>(namebeg->getName(), nameend->getName(), true);
+                            break;
+
+                            case 2:
+                            this->appendCreateSignalGeneric<ProcessSwitchSignal>(namebeg->getName(), nameend->getName(), true);
+                            break;
+
+                            default:
+                            assert(1 == 0 && "Unknown signal type. Program abort.");
+                        }
+                    }
+                    else if(buff == "<signalDetails>" || detailsMode)
+                    {
+                        detailsMode = true;
+
+                        //file >> buff;
+                        if(buff == "<starts>")
+                        {
+                            file >> beg;
+                        }
+                        else if(buff == "<type>")
+                        {
+                            file >> type;
+                        }
+                        else if(buff == "<ends>")
+                        {
+                            file >> end;
+                        }
+                    }
+                    break;
+                }
+                default:
+                {
+                    assert(1 == 0 && "Malformed XML file. Program abort.");
+                }
+            }
+
+
         }
 
         file.close();
+
+        refitAll();
+        refitAllSigs();
+
+        render();
 
     }
 
