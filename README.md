@@ -1,11 +1,11 @@
 # Uml Sequence editor
-Status: tworzony `(89%)`
+Status: tworzony `(91%)` (czeka na inne backendy i znalezienie krytycznych błędów)
 
 ## Wspierane backendy
 
 | Backend | Status          | Uwagi                                                         |
 |:-------:|:---------------:|:---------------------------------------------------------------:|
-| Vim     | W trakcie pracy | - |
+| Vim     | Gotowy | - |
 | MCedit  | -               |                                                               |
 |         |                 |                                                               |
 
