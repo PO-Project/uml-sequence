@@ -77,7 +77,15 @@ public:
             logix.right();
         }, "Select right/next actor");
 
+        bk.bind("<RARROW>", [this](void){
+            logix.right();
+        }, "Select right/next actor");
+
         bk.bind(":l", [this](void){
+            logix.left();
+        }, "Select left/previous actor");
+
+        bk.bind("<LARROW>", [this](void){
             logix.left();
         }, "Select left/previous actor");
         

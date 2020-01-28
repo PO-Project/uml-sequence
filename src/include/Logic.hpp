@@ -260,6 +260,8 @@ class Logic
 
                 if(oldsize != container.size())
                 {
+                    strong.reset();
+
                     refitAllSigs();
                     render();
                 }
