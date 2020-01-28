@@ -109,7 +109,9 @@ public:
             logix.insertCreateSignalGeneric<ProcessSwitchSignal>(getEntry("ARG"), getEntry("AARG"));
         }, "Insert jump/switch signal between two processes before selected position.");        
 
-        bk.bind(":crs", nullptr, "Throw unhandled exception");
+        bk.bind(":save ${ARG}", [this](void){
+            logix.save(getEntry("ARG"));
+        }, "Export to xml format");
        
     }
 

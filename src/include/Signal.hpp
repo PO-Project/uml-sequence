@@ -7,7 +7,7 @@
 
 class Process;
 
-class Signal : public IActor
+class Signal : public IActor, public IXmlAble
 {
     protected:
     
@@ -15,6 +15,8 @@ class Signal : public IActor
     Point b,e;
 
     public:
+
+    static constexpr int id{0};
 
     std::weak_ptr<Process> start, end;
 
@@ -27,6 +29,16 @@ class Signal : public IActor
         if(selected)r.setAttribute(A_REVERSE);
             entity->draw(r);
         if(selected)r.unsetAttribute(A_REVERSE);
+    }
+
+    std::string dumpDataIntoXmlFormat() const override
+    {
+        std::string ret;
+
+        ret+=XML::makeTag("starts", reinterpret_cast<long unsigned int>(start.lock().get()));
+        ret+=XML::makeTag("ends", reinterpret_cast<long unsigned int>(end.lock().get()));
+
+        return ret;
     }
 
     Point getCenter() const override
@@ -42,6 +54,8 @@ class InformationSignal : public Signal
 {
     public:
 
+    static constexpr int id{1};
+
     InformationSignal() = default;
 
     void lateConstructor()
@@ -56,6 +70,8 @@ class InformationSignal : public Signal
 class ProcessSwitchSignal : public Signal
 {
     public:
+
+    static constexpr int id{2};
 
     ProcessSwitchSignal() = default;
 

@@ -3,7 +3,6 @@
 
 #include "Renderer.hpp"
 #include "IDrawable.hpp"
-//#include <cmath>
 
 class Line : public IDrawable
 {
@@ -22,7 +21,7 @@ class Line : public IDrawable
                 int off = 1;
                 if(start.y > end.y)off = -1;
 
-                for(unsigned i = 0; i < abs(end.y - start.y); i++)
+                for(auto i = 0; i < abs(end.y - start.y); i++)
                 {
                     r.renderString("|", {start.x, start.y + off*i});
                 }
@@ -32,7 +31,7 @@ class Line : public IDrawable
                 int off = 1;
                 if(start.x > end.x)off = -1;
 
-                for(unsigned i = 0; i < abs(end.x - start.x); i++)
+                for(auto i = 0; i < abs(end.x - start.x); i++)
                 {
                     r.renderString("-", {start.x + off*i, start.y});
                 }

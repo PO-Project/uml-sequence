@@ -7,7 +7,7 @@
 #include "Line.hpp"
 #include "Signal.hpp"
 
-class Process : public IActor
+class Process : public IActor, public IXmlAble
 {
     std::string name;
     Box box;
@@ -42,6 +42,28 @@ class Process : public IActor
             boxUpdateName();
         }
         std::string getName() const {return name;}
+
+        std::string dumpDataIntoXmlFormat() const override
+        {
+            std::string ret;
+
+            ret += XML::makeTag("name", name);
+            
+            /*for(auto &i : signalsIn)
+            {
+                ret += XML::openTag("signalsIn");
+                ret += XML::makeTag("target", reinterpret_cast<long unsigned int>(i.lock().get()));
+                ret += XML::closeTag("signalsIn");
+            }
+            for(auto &i : signalsOut)
+            {
+                ret += XML::openTag("signalsOut");
+                ret += XML::makeTag("target", reinterpret_cast<long unsigned int>(i.lock().get()));
+                ret += XML::closeTag("signalsOut");
+            }*/
+
+            return ret;
+        }
 
         void setPosition(Point p)
         {

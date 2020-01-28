@@ -6,6 +6,7 @@
 #include "Process.hpp"
 #include <memory>
 #include <cassert>
+#include <fstream>
 
 class Logic
 {
@@ -528,6 +529,37 @@ class Logic
         signals.push_back(std::move(newsignal));
 
         render();
+    }
+
+    void save(std::string fname)
+    {
+        std::ofstream file(fname);
+
+        for(auto &i : processes)
+        {
+            //i->cullDeadSignals(3);
+            file<<XML::openTag("processes");
+            file<<XML::openTag("process");
+            file<<XML::makeTag("id", reinterpret_cast<long unsigned int>(i.get()));
+            file<<XML::partDelegate(*(i.get()), "processDetails");
+            file<<XML::closeTag("process");
+            file<<XML::closeTag("processes");
+        }
+
+        this->cullSignals();
+
+        for(auto &i : signals)
+        {
+            file<<XML::openTag("signals");
+            file<<XML::openTag("signal");
+            file<<XML::makeTag("id", reinterpret_cast<long unsigned int>(i.get()));
+            file<<XML::partDelegate(*(i.get()), "signalDetails");
+            file<<XML::closeTag("signal");
+            file<<XML::closeTag("signals");
+        }
+
+        file.close();
+
     }
 
     void render()

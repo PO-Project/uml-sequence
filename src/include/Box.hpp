@@ -6,7 +6,7 @@
 #include <string>
 
 
-class Box : IDrawable
+class Box : public IDrawable
 {
     std::string content{""};
     Point p; //lewy górny róg
@@ -27,10 +27,20 @@ class Box : IDrawable
         {
             return {p.x, p.y};
         }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnarrowing"
+#endif
+
         Point rightLowerCorner() const
         {
             return {p.x + 1 + content.size(), p.y + 2};
         }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
     friend class Process;
 };
