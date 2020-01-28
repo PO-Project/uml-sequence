@@ -57,7 +57,7 @@ class ProcessSwitchSignal : public Signal
 
     void lateConstructor()
     {
-        entity = std::make_unique<Line>(b, e);
+        entity = std::make_unique<Arrow>(b, e);
     }
 
     friend class Process;

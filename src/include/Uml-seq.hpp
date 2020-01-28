@@ -86,8 +86,20 @@ public:
         }, "Center on selected actor");
 
         bk.bind(":afs ${ARG} ${AARG}", [this](void){
-            logix.appendCreateInfSignalFromTo(getEntry("ARG"), getEntry("AARG"));
+            logix.appendCreateSignalGeneric<InformationSignal>(getEntry("ARG"), getEntry("AARG"));
         }, "Add information signal between two processes.");
+
+        bk.bind(":ajs ${ARG} ${AARG}", [this](void){
+            logix.appendCreateSignalGeneric<ProcessSwitchSignal>(getEntry("ARG"), getEntry("AARG"));
+        }, "Add jump/switch signal between two processes.");
+
+        bk.bind(":fs ${ARG} ${AARG}", [this](void){
+            logix.insertCreateSignalGeneric<InformationSignal>(getEntry("ARG"), getEntry("AARG"));
+        }, "Insert information signal between two processes before selected position.");
+
+        bk.bind(":js ${ARG} ${AARG}", [this](void){
+            logix.insertCreateSignalGeneric<ProcessSwitchSignal>(getEntry("ARG"), getEntry("AARG"));
+        }, "Insert jump/switch signal between two processes before selected position.");        
 
         bk.bind(":crs", nullptr, "Throw unhandled exception");
        

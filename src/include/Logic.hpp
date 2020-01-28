@@ -425,7 +425,50 @@ class Logic
         render();
     }
 
-    void appendCreateInfSignalFromTo(std::string from, std::string to)
+    template <typename T>
+    void insertCreateSignalGeneric(std::string from, std::string to)
+    {
+        if(currentMode != editionMode::Signals)
+        {
+            return;
+        }
+        auto strong = procSelected.lock();
+        
+        if(!strong)
+        {
+            return;
+        }
+
+        auto pos = getIteratorFromPointerActual(std::dynamic_pointer_cast<Signal>(strong), signals);
+
+        auto it1 = findByName(from, processes);
+        auto it2 = findByName(to, processes);
+
+        if(it1 == processes.end() || it2 == processes.end())
+        {
+            return;
+        }
+
+        auto newsignal = std::make_shared<T>();
+
+        newsignal->b = {0 /*to be set by process*/, actSignalPosition += minSignalSeparation};
+        newsignal->e = {0 /*a.b.*/, actSignalPosition};
+
+        (*it1)->signalEndPositionVertical = actSignalPosition;
+        (*it2)->signalEndPositionVertical = actSignalPosition;
+
+        (*it1)->pipeSignalFrom(newsignal);
+        (*it2)->pipeSignalTo(newsignal);
+
+        signals.insert(pos, std::move(newsignal));
+
+        refitAllSigs();
+
+        render();
+    }
+
+    template <typename T>
+    void appendCreateSignalGeneric(std::string from, std::string to)
     {
         if(currentMode != editionMode::Signals)
         {
@@ -440,7 +483,7 @@ class Logic
             return;
         }
 
-        auto newsignal = std::make_shared<InformationSignal>();
+        auto newsignal = std::make_shared<T>();
 
         newsignal->b = {0 /*to be set by process*/, actSignalPosition += minSignalSeparation};
         newsignal->e = {0 /*a.b.*/, actSignalPosition};

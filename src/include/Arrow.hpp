@@ -2,28 +2,30 @@
 #define _ARROW_HPP_
 
 #include "Line.hpp"
+#include <cassert>
 
 class Arrow : public Line
 {
     public:
     
-    Arrow(Point a, Point b) : Line(a - 1, b - 1) {}
+    Arrow(Point a, Point b) : Line(a, {b.x - 1, b.y}) {}
 
-    void draw(IRenderer *r)
+    void draw(IRenderer &r)
     {
         if(start.x == end.x)
         {
-            this->Arrow::draw(r);
-            r->renderString(">", end);
+            assert(1 != 0 && "NOT NEEDED");
         }
         else if(start.y == end.y)
         {
-            this->Arrow::draw(r);
-            r->renderString("\\/", end);
+            Line::draw(r);
+
+            if(end.x > start.x)r.renderString(">", end);
+            else r.renderString("<", {end.x + 1, end.y});
         }
         else
         {
-            std::terminate();
+            assert(1 != 0 && "NOT NEEDED");
         }
             
     }
