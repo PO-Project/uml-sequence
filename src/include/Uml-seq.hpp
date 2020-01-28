@@ -43,10 +43,12 @@ public:
 
         bk.bind(":act ${ARG}", [this](void){
             logix.addProcess(getEntry("ARG"));
+            setEntry("IS_SAVED", "NO");
         }, "Creates a new actor with specified name");
 
         bk.bind(":rma ${ARG}", [this](void){
             logix.remProcess(getEntry("ARG"));
+            setEntry("IS_SAVED", "NO");
         }, "Removes all actors with specified name");
 
         bk.bind(":sel ${ARG}", [this](void){
@@ -59,6 +61,7 @@ public:
 
         bk.bind(":edit ${ARG}", [this](void){
             logix.editSelected(getEntry("ARG"));
+            setEntry("IS_SAVED", "NO");
         }, "Edits selected actor.");
 
         bk.bind(":mode ${ARG}", [this](void){
@@ -67,10 +70,12 @@ public:
 
         bk.bind("<DEL>", [this](void){
             logix.deleteSelected();
+            setEntry("IS_SAVED", "NO");
         }, "Deletes selected actor.");
 
         bk.bind(":del", [this](void){
             logix.deleteSelected();
+            setEntry("IS_SAVED", "NO");
         }, "Deletes selected actor.");
 
         bk.bind(":r", [this](void){
@@ -95,26 +100,36 @@ public:
 
         bk.bind(":afs ${ARG} ${AARG}", [this](void){
             logix.appendCreateSignalGeneric<InformationSignal>(getEntry("ARG"), getEntry("AARG"));
+            setEntry("IS_SAVED", "NO");
         }, "Add information signal between two processes.");
 
         bk.bind(":ajs ${ARG} ${AARG}", [this](void){
             logix.appendCreateSignalGeneric<ProcessSwitchSignal>(getEntry("ARG"), getEntry("AARG"));
+            setEntry("IS_SAVED", "NO");
         }, "Add jump/switch signal between two processes.");
 
         bk.bind(":fs ${ARG} ${AARG}", [this](void){
             logix.insertCreateSignalGeneric<InformationSignal>(getEntry("ARG"), getEntry("AARG"));
+            setEntry("IS_SAVED", "NO");
         }, "Insert information signal between two processes before selected position.");
 
         bk.bind(":js ${ARG} ${AARG}", [this](void){
             logix.insertCreateSignalGeneric<ProcessSwitchSignal>(getEntry("ARG"), getEntry("AARG"));
+            setEntry("IS_SAVED", "NO");
         }, "Insert jump/switch signal between two processes before selected position.");        
 
         bk.bind(":save ${ARG}", [this](void){
             logix.save(getEntry("ARG"));
+            setEntry("IS_SAVED", "YES");
         }, "Export to xml format");
+
+        bk.bind(":forget", [this](void){
+            setEntry("IS_SAVED", "YES");
+        }, "Forces backend to think, that file has been saved.");
 
         bk.bind(":load ${ARG}", [this](void){
             logix.load(getEntry("ARG"));
+            setEntry("IS_SAVED", "YES");
         }, "Load from xml file");
        
     }
