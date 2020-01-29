@@ -1,6 +1,8 @@
 # Uml Sequence editor
 Status: tworzony `(91%)` (czeka na inne backendy i znalezienie krytycznych błędów)
 
+> ZALICZONY, NIE BĘDZIE ROZWIJANY!
+
 ## Wspierane backendy
 
 | Backend | Status          | Uwagi                                                         |
