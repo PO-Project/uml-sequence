@@ -235,6 +235,10 @@ class Logic
             if(auto strong = procSelected.lock())
             {
                 (std::dynamic_pointer_cast<Process>(strong))->setName(name);
+
+                refitAll();
+                refitAllSigs();
+
                 render();
             }
         }
