@@ -148,6 +148,29 @@ class Logic
         }
     }
 
+    void insertProcess(std::string name)
+    {
+        if(currentMode == editionMode::Procs)
+        {
+            auto strong = procSelected.lock();
+        
+            if(!strong)
+            {
+                return;
+            }
+
+            auto pos = getIteratorFromPointerActual(std::dynamic_pointer_cast<Process>(strong), processes);
+
+            Point p{actPosition += minSpace, minYPosition};
+            processes.insert(pos, std::move(std::make_shared<Process>(name, p)));
+
+            refitAll();
+            refitAllSigs();
+
+            render();
+        }
+    }
+
     void remProcess(std::string name)
     {
         if(currentMode == editionMode::Procs)

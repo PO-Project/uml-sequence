@@ -68,6 +68,10 @@ public:
             logix.setEditionMode(getEntry("ARG"));
         }, "Set edition mode (actors/signals).");
 
+        bk.bind(":ins ${ARG}", [this](void){
+            logix.insertProcess(getEntry("ARG"));
+        }, "Insert process before selected actor.");
+
         bk.bind("<DEL>", [this](void){
             logix.deleteSelected();
             setEntry("IS_SAVED", "NO");
