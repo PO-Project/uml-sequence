@@ -11,8 +11,15 @@ BUILDSOUP = $(wildcard ./build/*.o)
 .PHONY: sources targets all target clean rebuild
 .SUFFIXES:
 
-all: target
+all: vim-app
+
+vim-app: prep target
+	cmake ./backends/vim-backend/ -B ./backends/vim-backend/
+	cmake --build ./backends/vim-backend/
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(BUILDSOUP) $(LINKFLAGS) 
+
+prep:
+	[ -d build ] || mkdir build
 
 target: $(TARGETS)
 

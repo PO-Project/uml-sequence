@@ -13,6 +13,13 @@ Status: tworzony `(91%)` (czeka na inne backendy i znalezienie krytycznych błę
 
 ## Kompilacja i uruchomienie
 
+Klonuj w sposób:
+
+```
+git clone --recurse-submodules https://github.com/PO-project/uml-sequence
+```
+Gdy skończy:
+
 ```
 make all
 chmod u+x uml-seq.app
